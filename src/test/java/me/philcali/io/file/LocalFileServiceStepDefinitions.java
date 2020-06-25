@@ -6,6 +6,7 @@ import io.cucumber.java.en.Then;
 import io.cucumber.java.en.When;
 import me.philcali.io.file.io.file.File;
 import me.philcali.io.file.io.file.FileService;
+import me.philcali.io.file.io.file.Filters;
 import me.philcali.io.file.io.file.LocalFileService;
 import org.junit.Assert;
 
@@ -37,9 +38,13 @@ public class LocalFileServiceStepDefinitions {
     }
 
     @ParameterType(name = "regex", value = "\"([^\"]+)\"")
-    public Predicate<File> createGlobFilter(final String regex) {
-        final Pattern pattern = Pattern.compile(regex);
-        return file -> pattern.matcher(file.path().toString()).find();
+    public Predicate<File> createRegexFilter(final String regex) {
+        return Filters.regex(regex);
+    }
+
+    @ParameterType(name = "glob", value = "\"([^\"]+)\"")
+    public Predicate<File> createGlobFilter(final String glob) {
+        return Filters.glob(glob);
     }
 
     @When("{} invokes find on {directory}")
@@ -48,7 +53,12 @@ public class LocalFileServiceStepDefinitions {
     }
 
     @When("{} invokes find on {directory} with a regex filter of {regex}")
-    public void serviceCallsFind(final String user, final Path directory, final Predicate<File> glob) {
+    public void serviceCallsFind(final String user, final Path directory, final Predicate<File> regex) {
+        resultingPaths = service.find(directory, regex).map(File::path).collect(Collectors.toList());
+    }
+
+    @When("{} invokes find on {directory} with a glob filter of {glob}")
+    public void serviceCallsFindGlob(final String user, final Path directory, final Predicate<File> glob) {
         resultingPaths = service.find(directory, glob).map(File::path).collect(Collectors.toList());
     }
 
