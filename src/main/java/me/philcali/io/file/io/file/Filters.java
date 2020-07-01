@@ -33,7 +33,6 @@ public final class Filters {
                     break;
             }
         }
-        System.out.println(globPattern);
         return regex(globPattern);
     }
 }
